@@ -1,0 +1,61 @@
+name: ci
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+          submodules: recursive
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.3
+
+    - name: Build Solution (x64)
+      run: msbuild "-p:Configuration=Release;Platform=x64;CI_VERSION=${{ github.ref_name }}" WinIconPatcher.sln
+    - name: Build Solution (ARM64)
+      run: msbuild "-p:Configuration=Release;Platform=ARM64;CI_VERSION=${{ github.ref_name }}" WinIconPatcher.sln
+      # Win32 built last
+    - name: Build Solution (Win32)
+      run: msbuild "-p:Configuration=Release;Platform=Win32;CI_VERSION=${{ github.ref_name }}" WinIconPatcher.sln
+
+    - name: Upload everything to Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Everything
+        path: .\bin\Release\**\*.*
+    - name: Upload IconTool to Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: IconTool
+        path: |
+          .\bin\Release\Win32\IconTool.exe
+          .\bin\Release\Win32\IconTool.pdb
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: IconTool
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: IconTool.exe
+          name: Release ${{ github.ref_name }}
+          prerelease: true
