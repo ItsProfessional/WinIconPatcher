@@ -6,6 +6,8 @@
 
 WinIconPatcher is a piece of software that replaces icons in windows system files.
 
+**NOTE: Currently not functional.**
+
 ## Features
 
 * Free and Open Source (FOSS)
