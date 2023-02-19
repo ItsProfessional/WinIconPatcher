@@ -15,7 +15,6 @@ WinIconPatcher is a piece of software that replaces icons in windows system file
 ## Limitations
 
 * Installing feature updates on windows resets the icons, so you have to apply them again after installing a feature update, which is rolled out once each year.
-* Not necessarily a limitation, but the project uses Resource Hacker, which is known to be safe but is closed source. If you know about a command line program or a library that can do this better, please let me know.
 
 ## Operating System Support\*
 
